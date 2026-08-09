@@ -7,6 +7,9 @@ import router from "./routes/routes";
 const app: Application = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/public", express.static("public"));
+
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");

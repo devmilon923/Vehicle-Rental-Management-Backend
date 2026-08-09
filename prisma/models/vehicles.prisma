@@ -1,0 +1,11 @@
+model Vehicle {
+  id           Int       @id @default(autoincrement())
+  name         String
+  plate_number String    @unique
+  category     String
+  daily_rate   Decimal
+  photo_path   String?
+  deleted_at   DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+}

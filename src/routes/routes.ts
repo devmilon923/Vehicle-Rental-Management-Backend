@@ -1,5 +1,6 @@
 import { Router } from "express";
 import AuthRoutes from "../modules/auth/route";
+import VehicleRoutes from "../modules/vehicles/route";
 
 const router = Router();
 
@@ -9,7 +10,12 @@ export const appRouters = [
     path: "/auth",
     handler: AuthRoutes,
   },
+  {
+    path: "/vehicles",
+    handler: VehicleRoutes,
+  },
 ];
+
 
 // ready for use
 appRouters.forEach(({ path, handler }) => {
