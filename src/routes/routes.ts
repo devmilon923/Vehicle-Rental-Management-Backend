@@ -1,12 +1,14 @@
 import { Router } from "express";
+import AuthRoutes from "../modules/auth/route";
+
 const router = Router();
 
 // config all root and handler
 export const appRouters = [
-  //   {
-  //     path: "/auth",
-  //     handler: AuthRoutes,
-  //   },
+  {
+    path: "/auth",
+    handler: AuthRoutes,
+  },
 ];
 
 // ready for use

@@ -1,4 +1,5 @@
 import { ErrorRequestHandler } from "express";
+import { ZodError } from "zod";
 import ServerError from "../util/error";
 import {
   PrismaClientKnownRequestError,
@@ -17,6 +18,12 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   if (error instanceof ServerError) {
     errorInfo.statusCode = error.statusCode;
     errorInfo.errorMessage = error.message;
+  } else if (error instanceof ZodError) {
+    errorInfo.statusCode = 400;
+    errorInfo.errorType = "Validation error";
+    errorInfo.errorMessage = error.issues
+      .map((issue) => issue.message)
+      .join(", ");
   }
   if (error instanceof PrismaClientKnownRequestError) {
     // Known Prisma errors

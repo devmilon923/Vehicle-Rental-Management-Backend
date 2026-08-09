@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import ApiError from "../util/error";
+import ServerError from "../util/error";
 
 export interface IUserPayload extends jwt.JwtPayload {
   id: string;
@@ -17,13 +17,13 @@ export const guardRole = (allowedRoles: AllowedRoles) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
-      throw new ApiError(401, "Access denied. No token provided.");
+      throw new ServerError(401, "Access denied. No token provided.");
     }
 
     try {
       const decoded = jwt.verify(
         token,
-        process.env.JWT_SECRET_KEY as string,
+        (process.env.JWT_SECRET || process.env.JWT_SECRET_KEY) as string,
       ) as IUserPayload;
 
       (req as any).user = decoded;
@@ -38,12 +38,12 @@ export const guardRole = (allowedRoles: AllowedRoles) => {
         return next();
       }
 
-      throw new ApiError(
+      throw new ServerError(
         403,
         "You are not authorized to access this resource.",
       );
     } catch (error) {
-      throw new ApiError(498, "Session Expired");
+      throw new ServerError(401, "Session Expired");
     }
   };
 };

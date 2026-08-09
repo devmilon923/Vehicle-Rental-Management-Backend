@@ -6,6 +6,8 @@ import router from "./routes/routes";
 
 const app: Application = express();
 
+app.use(express.json());
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
