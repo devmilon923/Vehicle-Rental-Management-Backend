@@ -8,4 +8,6 @@ model Vehicle {
   deleted_at   DateTime?
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
+
+  rentals      Rental[]
 }

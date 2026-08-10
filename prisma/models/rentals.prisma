@@ -1,0 +1,21 @@
+enum RentalStatus {
+  BOOKED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model Rental {
+  id             Int          @id @default(autoincrement())
+  vehicle_id     Int
+  customer_name  String
+  customer_phone String
+  start_date     DateTime
+  end_date       DateTime
+  total_amount   Decimal
+  status         RentalStatus @default(BOOKED)
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+
+  vehicle        Vehicle      @relation(fields: [vehicle_id], references: [id])
+}

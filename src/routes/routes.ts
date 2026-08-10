@@ -1,6 +1,7 @@
 import { Router } from "express";
 import AuthRoutes from "../modules/auth/route";
 import VehicleRoutes from "../modules/vehicles/route";
+import RentalRoutes from "../modules/rentals/route";
 
 const router = Router();
 
@@ -14,6 +15,10 @@ export const appRouters = [
     path: "/vehicles",
     handler: VehicleRoutes,
   },
+  {
+    path: "/rentals",
+    handler: RentalRoutes,
+  },
 ];
 
 
@@ -23,3 +28,4 @@ appRouters.forEach(({ path, handler }) => {
 });
 
 export default router;
+
