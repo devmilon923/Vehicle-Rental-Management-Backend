@@ -12,7 +12,8 @@ export const createVehicleSchema = z.object({
       }
       return val;
     },
-    z.number({ message: "Daily rate must be a valid number" })
+    z
+      .number({ message: "Daily rate must be a valid number" })
       .gt(0, "Daily rate must be greater than zero")
   ),
 });
@@ -29,7 +30,8 @@ export const updateVehicleSchema = z.object({
       }
       return val;
     },
-    z.number({ message: "Daily rate must be a valid number" })
+    z
+      .number({ message: "Daily rate must be a valid number" })
       .gt(0, "Daily rate must be greater than zero")
       .optional()
   ),
@@ -44,7 +46,10 @@ export const vehicleIdSchema = z.object({
       }
       return val;
     },
-    z.number({ message: "Invalid vehicle ID" }).int().positive("Invalid vehicle ID")
+    z
+      .number({ message: "Invalid vehicle ID" })
+      .int()
+      .positive("Invalid vehicle ID")
   ),
 });
 

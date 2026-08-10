@@ -1,9 +1,14 @@
 import fs from "fs";
 import path from "path";
+import { Prisma } from "../../generated/prisma/client";
 import { prisma } from "../../util/prisma";
 import ServerError from "../../util/error";
 import paginationBuilder from "../../util/pagination";
-import { CreateVehicleInput, UpdateVehicleInput, VehicleQueryInput } from "./validation";
+import {
+  CreateVehicleInput,
+  UpdateVehicleInput,
+  VehicleQueryInput,
+} from "./validation";
 
 export class VehicleService {
   async getAllVehicles(query: VehicleQueryInput) {
@@ -11,7 +16,7 @@ export class VehicleService {
 
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: Prisma.VehicleWhereInput = {
       deleted_at: null,
     };
 
@@ -74,7 +79,10 @@ export class VehicleService {
     });
 
     if (existingVehicle) {
-      throw new ServerError(409, "Vehicle with this plate number already exists");
+      throw new ServerError(
+        409,
+        "Vehicle with this plate number already exists"
+      );
     }
 
     const vehicle = await prisma.vehicle.create({
@@ -90,7 +98,11 @@ export class VehicleService {
     return vehicle;
   }
 
-  async updateVehicle(id: number, payload: UpdateVehicleInput, photoPath?: string) {
+  async updateVehicle(
+    id: number,
+    payload: UpdateVehicleInput,
+    photoPath?: string
+  ) {
     const existingVehicle = await prisma.vehicle.findFirst({
       where: {
         id,
@@ -102,13 +114,19 @@ export class VehicleService {
       throw new ServerError(404, "Vehicle not found");
     }
 
-    if (payload.plate_number && payload.plate_number !== existingVehicle.plate_number) {
+    if (
+      payload.plate_number &&
+      payload.plate_number !== existingVehicle.plate_number
+    ) {
       const duplicatePlate = await prisma.vehicle.findUnique({
         where: { plate_number: payload.plate_number },
       });
 
       if (duplicatePlate) {
-        throw new ServerError(409, "Vehicle with this plate number already exists");
+        throw new ServerError(
+          409,
+          "Vehicle with this plate number already exists"
+        );
       }
     }
 
@@ -121,11 +139,13 @@ export class VehicleService {
       });
     }
 
-    const updateData: any = {};
+    const updateData: Prisma.VehicleUpdateInput = {};
     if (payload.name !== undefined) updateData.name = payload.name;
-    if (payload.plate_number !== undefined) updateData.plate_number = payload.plate_number;
+    if (payload.plate_number !== undefined)
+      updateData.plate_number = payload.plate_number;
     if (payload.category !== undefined) updateData.category = payload.category;
-    if (payload.daily_rate !== undefined) updateData.daily_rate = payload.daily_rate;
+    if (payload.daily_rate !== undefined)
+      updateData.daily_rate = payload.daily_rate;
     if (photoPath !== undefined) updateData.photo_path = photoPath;
 
     const updatedVehicle = await prisma.vehicle.update({

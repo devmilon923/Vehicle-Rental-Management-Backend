@@ -10,13 +10,13 @@ export interface IApiResponse<T> {
     prevPage?: number;
     nextPage?: number;
     totalData?: number;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   data?: T;
 }
 
 const sendResponse = <T>(res: Response, data: IApiResponse<T>): void => {
-  const responseData: Record<string, any> = {
+  const responseData: Record<string, unknown> = {
     success: data.success,
     statusCode: data.statusCode,
     message: data.message,

@@ -48,7 +48,10 @@ class VehicleController {
       const validatedData = createVehicleSchema.parse(req.body);
       const photoPath = req.file ? req.file.path : undefined;
 
-      const vehicle = await vehicleService.createVehicle(validatedData, photoPath);
+      const vehicle = await vehicleService.createVehicle(
+        validatedData,
+        photoPath
+      );
 
       return sendResponse(res, {
         statusCode: 201,
@@ -68,10 +71,17 @@ class VehicleController {
       const photoPath = req.file ? req.file.path : undefined;
 
       if (Object.keys(validatedData).length === 0 && !photoPath) {
-        throw new ServerError(400, "At least one field or photo must be provided for update");
+        throw new ServerError(
+          400,
+          "At least one field or photo must be provided for update"
+        );
       }
 
-      const vehicle = await vehicleService.updateVehicle(id, validatedData, photoPath);
+      const vehicle = await vehicleService.updateVehicle(
+        id,
+        validatedData,
+        photoPath
+      );
 
       return sendResponse(res, {
         statusCode: 200,

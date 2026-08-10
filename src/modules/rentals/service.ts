@@ -2,8 +2,12 @@ import { prisma } from "../../util/prisma";
 import ServerError from "../../util/error";
 import paginationBuilder from "../../util/pagination";
 import { calculateRentalDays, toUTCMidnight } from "../../util/date";
-import { CreateRentalInput, UpdateRentalInput, RentalQueryInput } from "./validation";
-import { RentalStatus } from "../../generated/prisma/client";
+import {
+  CreateRentalInput,
+  UpdateRentalInput,
+  RentalQueryInput,
+} from "./validation";
+import { Prisma, RentalStatus } from "../../generated/prisma/client";
 
 export class RentalService {
   /**
@@ -49,7 +53,10 @@ export class RentalService {
     const endDate = toUTCMidnight(payload.end_date);
 
     if (startDate.getTime() > endDate.getTime()) {
-      throw new ServerError(400, "start_date must be less than or equal to end_date");
+      throw new ServerError(
+        400,
+        "start_date must be less than or equal to end_date"
+      );
     }
 
     // Step 2 — Find Vehicle (must exist and not be soft-deleted)
@@ -95,10 +102,17 @@ export class RentalService {
    * Get list of rentals with optional filters (vehicle_id, status, date range)
    */
   async getAllRentals(query: RentalQueryInput) {
-    const { page = 1, limit = 10, vehicle_id, status, start_date, end_date } = query;
+    const {
+      page = 1,
+      limit = 10,
+      vehicle_id,
+      status,
+      start_date,
+      end_date,
+    } = query;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.RentalWhereInput = {};
 
     if (vehicle_id !== undefined) {
       where.vehicle_id = vehicle_id;
@@ -186,10 +200,14 @@ export class RentalService {
     const targetEndDate = payload.end_date
       ? toUTCMidnight(payload.end_date)
       : existingRental.end_date;
-    const targetStatus = (payload.status as RentalStatus) ?? existingRental.status;
+    const targetStatus =
+      (payload.status as RentalStatus) ?? existingRental.status;
 
     if (targetStartDate.getTime() > targetEndDate.getTime()) {
-      throw new ServerError(400, "start_date must be less than or equal to end_date");
+      throw new ServerError(
+        400,
+        "start_date must be less than or equal to end_date"
+      );
     }
 
     // Verify vehicle exists and is not soft deleted
@@ -205,26 +223,41 @@ export class RentalService {
     }
 
     // Re-check double-booking conflict if vehicle, dates, or active status are involved
-    if (targetStatus === RentalStatus.BOOKED || targetStatus === RentalStatus.ONGOING) {
-      await this.checkOverlap(targetVehicleId, targetStartDate, targetEndDate, id);
+    if (
+      targetStatus === RentalStatus.BOOKED ||
+      targetStatus === RentalStatus.ONGOING
+    ) {
+      await this.checkOverlap(
+        targetVehicleId,
+        targetStartDate,
+        targetEndDate,
+        id
+      );
     }
 
     // Recalculate total amount if vehicle or dates changed
-    const vehicleChanged = payload.vehicle_id !== undefined && payload.vehicle_id !== existingRental.vehicle_id;
-    const datesChanged = payload.start_date !== undefined || payload.end_date !== undefined;
+    const vehicleChanged =
+      payload.vehicle_id !== undefined &&
+      payload.vehicle_id !== existingRental.vehicle_id;
+    const datesChanged =
+      payload.start_date !== undefined || payload.end_date !== undefined;
 
-    let totalAmount = existingRental.total_amount;
+    let totalAmount: Prisma.Decimal | number = existingRental.total_amount;
     if (vehicleChanged || datesChanged) {
       const rentalDays = calculateRentalDays(targetStartDate, targetEndDate);
       const dailyRate = Number(targetVehicle.daily_rate);
-      totalAmount = (dailyRate * rentalDays) as any;
+      totalAmount = dailyRate * rentalDays;
     }
 
-    const updateData: any = {};
-    if (payload.vehicle_id !== undefined) updateData.vehicle_id = payload.vehicle_id;
-    if (payload.customer_name !== undefined) updateData.customer_name = payload.customer_name;
-    if (payload.customer_phone !== undefined) updateData.customer_phone = payload.customer_phone;
-    if (payload.start_date !== undefined) updateData.start_date = targetStartDate;
+    const updateData: Prisma.RentalUncheckedUpdateInput = {};
+    if (payload.vehicle_id !== undefined)
+      updateData.vehicle_id = payload.vehicle_id;
+    if (payload.customer_name !== undefined)
+      updateData.customer_name = payload.customer_name;
+    if (payload.customer_phone !== undefined)
+      updateData.customer_phone = payload.customer_phone;
+    if (payload.start_date !== undefined)
+      updateData.start_date = targetStartDate;
     if (payload.end_date !== undefined) updateData.end_date = targetEndDate;
     if (payload.status !== undefined) updateData.status = targetStatus;
 

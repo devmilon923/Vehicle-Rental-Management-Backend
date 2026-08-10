@@ -1,9 +1,10 @@
+import { Request } from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
 import ServerError from "./error";
 
-const uploadDir = "./public/data/uploads/";
+const uploadDir = process.env.UPLOAD_PATH || "./public/data/uploads/";
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -18,14 +19,16 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (
-  req: any,
+  req: Request,
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
-    cb(new ServerError(400, "Only image files are allowed") as any);
+    cb(
+      new ServerError(400, "Only image files are allowed") as unknown as Error
+    );
   }
 };
 
@@ -38,4 +41,3 @@ const upload = multer({
 });
 
 export default upload;
-

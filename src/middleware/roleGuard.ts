@@ -23,7 +23,7 @@ export const guardRole = (allowedRoles: AllowedRoles) => {
     try {
       const decoded = jwt.verify(
         token,
-        (process.env.JWT_SECRET || process.env.JWT_SECRET_KEY) as string,
+        (process.env.JWT_SECRET || process.env.JWT_SECRET_KEY) as string
       ) as IUserPayload;
 
       (req as any).user = decoded;
@@ -40,7 +40,7 @@ export const guardRole = (allowedRoles: AllowedRoles) => {
 
       throw new ServerError(
         403,
-        "You are not authorized to access this resource.",
+        "You are not authorized to access this resource."
       );
     } catch (error) {
       throw new ServerError(401, "Session Expired");
