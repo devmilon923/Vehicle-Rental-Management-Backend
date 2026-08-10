@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { vehicleService } from "./service";
 import ServerError from "../../util/error";
+import sendResponse from "../../util/sendResponse";
 import {
   createVehicleSchema,
   updateVehicleSchema,
@@ -14,7 +15,8 @@ class VehicleController {
       const validatedQuery = vehicleQuerySchema.parse(req.query);
       const result = await vehicleService.getAllVehicles(validatedQuery);
 
-      return res.status(200).json({
+      return sendResponse(res, {
+        statusCode: 200,
         success: true,
         message: "Vehicles fetched successfully",
         data: result.vehicles,
@@ -30,7 +32,8 @@ class VehicleController {
       const { id } = vehicleIdSchema.parse(req.params);
       const vehicle = await vehicleService.getVehicleById(id);
 
-      return res.status(200).json({
+      return sendResponse(res, {
+        statusCode: 200,
         success: true,
         message: "Vehicle retrieved successfully",
         data: vehicle,
@@ -47,7 +50,8 @@ class VehicleController {
 
       const vehicle = await vehicleService.createVehicle(validatedData, photoPath);
 
-      return res.status(201).json({
+      return sendResponse(res, {
+        statusCode: 201,
         success: true,
         message: "Vehicle created successfully",
         data: vehicle,
@@ -69,7 +73,8 @@ class VehicleController {
 
       const vehicle = await vehicleService.updateVehicle(id, validatedData, photoPath);
 
-      return res.status(200).json({
+      return sendResponse(res, {
+        statusCode: 200,
         success: true,
         message: "Vehicle updated successfully",
         data: vehicle,
@@ -84,7 +89,8 @@ class VehicleController {
       const { id } = vehicleIdSchema.parse(req.params);
       await vehicleService.deleteVehicle(id);
 
-      return res.status(200).json({
+      return sendResponse(res, {
+        statusCode: 200,
         success: true,
         message: "Vehicle deleted successfully",
       });
